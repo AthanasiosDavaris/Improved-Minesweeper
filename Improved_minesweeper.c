@@ -119,3 +119,38 @@ int main(void)
   printf("Congratulations, you won the game!\n");
   exit_game(board, board_state, rows);
 }
+
+// Initialize the boards
+void init_boards(int ***board, int ***board_state, int rows, int cols)
+{
+  *board = (int **)malloc(rows * sizeof(int *));
+  *board_state = (int **)malloc(rows * sizeof(int *));
+  if (!(*board) || !(board_state))
+  {
+    printf("Error: Memory allocation failed.\n");
+    exit(EXIT_FAILURE);
+  }
+
+  for (int i = 0; i < rows; i++)
+  {
+    (*board)[i] = (int *)calloc(cols, sizeof(int));
+    (*board_state)[i] = (int *)calloc(cols, sizeof(int));
+    if (!(*board)[i] || !(board_state)[i])
+    {
+      printf("Error: Memory allocation failed.\n");
+      exit(EXIT_FAILURE);
+    }
+  }
+}
+
+// fre the allocated memory from the boards
+void free_boards(int **board, int **board_state, int rows)
+{
+  for (int i = 0; i < rows; i++)
+  {
+    free(board[i]);
+    free(board_state[i]);
+  }
+  free(board);
+  free(board_state);
+}
