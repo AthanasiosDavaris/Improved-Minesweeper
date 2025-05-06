@@ -19,7 +19,7 @@ int parse_cords(char str[], int offset, int *x_out);
 void exit_game(int **board, int **board_state, int rows);
 int open_cell(int row, int col, int **board, int **board_state, int rows, int cols);
 void mark_cell(int row, int col, int **board, int **board_state);
-void cheat(int **board, int **board_state, int rows, int cols);
+void cheat(int **board, int **board_state, int row, int col);
 void place_mines(int **board, int rows, int cols, int total_mines, int safe_row, int safe_col);
 void calc_adj_mines(int **board, int rows, int cols);
 
@@ -143,7 +143,7 @@ void init_boards(int ***board, int ***board_state, int rows, int cols)
   }
 }
 
-// fre the allocated memory from the boards
+// free the allocated memory from the boards
 void free_boards(int **board, int **board_state, int rows)
 {
   for (int i = 0; i < rows; i++)
@@ -153,4 +153,198 @@ void free_boards(int **board, int **board_state, int rows)
   }
   free(board);
   free(board_state);
+}
+
+// Prints the board headers
+void print_board_headers(int cols)
+{
+  printf("   ");
+  for (int i = 1; i <= cols; i++)
+  {
+    printf("%2d", i);
+  }
+  printf("\n   ");
+  for (int i = 0; i < cols; i++)
+  {
+    printf("---");
+  }
+  printf("\n");
+}
+
+void print_board(int **board, int **board_state, int rows, int cols)
+{
+  for (int i = 0; i < rows; i++)
+  {
+    printf("%2d|", i + 1);
+    for (int j = 0; j < cols; j++)
+    {
+      if (board_state[i][j] == CLOSED)
+      {
+        printf(" # ");
+      }
+      else if (board[i][j] == MINE)
+      {
+        printf(" * ");
+      }
+      else if (board[i][j] == FLAG)
+      {
+        printf(" @ ");
+      }
+      else
+      {
+        printf(" %d ", board[i][j]);
+      }
+    }
+    printf("\n");
+  }
+}
+
+// function that reads text (credits to my university professor)
+int read_text(char str[], int size, int flag)
+{
+  int len;
+
+  if (fgets(str, size, stdin) == NULL)
+  {
+    printf("Error: fgets() failed\n");
+    exit(EXIT_FAILURE);
+  }
+  len = strlen(str);
+  if (len > 0)
+  {
+    if (flag && (str[len - 1] == '\n'))
+    {
+      str[len - 1] = '\0';
+      len--;
+    }
+  }
+  else
+  {
+    printf("Error: No input\n");
+    exit(EXIT_FAILURE);
+  }
+  return len;
+}
+
+// Parse coordinates (x, y) of a command
+int parse_cords(char str[], int offset, int *x_out)
+{
+  int x, y;
+  if (sscanf(str + offset, "(%d,%d)", &x, &y) == 2)
+  {
+    *x_out = x;
+    return y;
+  }
+  return 0;
+}
+
+// Exit the game and free board occupied memory
+void exit_game(int **board, int **board_state, int rows)
+{
+  printf("Thank you for playing!\n");
+  free_boards(board, board_state, rows);
+  exit(EXIT_SUCCESS);
+}
+
+// recursively opens a cell and reveal its content
+int open_cell(int row, int col, int **board, int **board_state, int rows, int cols)
+{
+  if (row < 0 || row >= rows || col < 0 || col >= cols || board_state[row][col] == OPEN)
+  {
+    return 0;
+  }
+
+  if (board[row][col] == MINE)
+  {
+    printf("Game over! You hit a mine.\n");
+    exit_game(board, board_state, rows);
+  }
+
+  board_state[row][col] = OPEN;
+  int opened = 1;
+
+  if (board[row][col] == 0)
+  {
+    for (int i = row - 1; i <= row + 1; i++)
+    {
+      for (int j = col - 1; j <= col + 1; j++)
+      {
+        if (i != row || j != col)
+        {
+          opened += open_cell(i, j, board, board_state, rows, cols);
+        }
+      }
+    }
+  }
+  return opened;
+}
+
+// Mark a cell
+void mark_cell(int row, int col, int **board, int **board_state)
+{
+  if (board_state[row][col] == OPEN)
+  {
+    printf("This cell is already open. You cannot mark it.\n");
+  }
+  else
+  {
+    board[row][col] = FLAG;
+    board_state[row][col] = OPEN;
+  }
+}
+
+// cheat and reveal the content of a cell
+void cheat(int **board, int **board_state, int row, int col)
+{
+  if (row < 0 || col < 0 || board[row][col] == MINE)
+  {
+    printf("This cell contains a mine!\n");
+  }
+  else
+  {
+    printf("This cell contains: %d\n", board[row][col]);
+  }
+}
+
+void place_mines(int **board, int rows, int cols, int total_mines, int safe_row, int safe_col)
+{
+  int placed = 0;
+  while (placed < total_mines)
+  {
+    int rand_row = rand() % rows;
+    int rand_col = rand() % cols;
+    if (board[rand_row][rand_col] == MINE || (abs(rand_row - safe_row) <= 1 && abs(rand_col - safe_col) <= 1))
+    {
+      continue;
+    }
+    board[rand_row][rand_col] = MINE;
+    placed++;
+  }
+}
+
+// calculates the number of adjacent mines of each cell in the board
+void calc_adj_mines(int **board, int rows, int cols)
+{
+  for (int i = 0; i < rows; i++)
+  {
+    for (int j = 0; j < cols; j++)
+    {
+      if (board[i][j] == MINE)
+      {
+        continue;
+      }
+      int count = 0;
+      for (int x = i - 1; x <= i + 1; x++)
+      {
+        for (int y = j - 1; y <= j + 1; y++)
+        {
+          if (x >= 0 && x < rows && y >= 0 && y < cols && board[x][y] == MINE)
+          {
+            count++;
+          }
+        }
+      }
+      board[i][j] = count;
+    }
+  }
 }
