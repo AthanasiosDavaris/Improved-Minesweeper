@@ -135,7 +135,7 @@ void init_boards(int ***board, int ***board_state, int rows, int cols)
   {
     (*board)[i] = (int *)calloc(cols, sizeof(int));
     (*board_state)[i] = (int *)calloc(cols, sizeof(int));
-    if (!(*board)[i] || !(board_state)[i])
+    if (!(*board)[i] || !(*board_state)[i])
     {
       printf("Error: Memory allocation failed.\n");
       exit(EXIT_FAILURE);
