@@ -161,7 +161,7 @@ void print_board_headers(int cols)
   printf("   ");
   for (int i = 1; i <= cols; i++)
   {
-    printf("%2d", i);
+    printf("%2d ", i);
   }
   printf("\n   ");
   for (int i = 0; i < cols; i++)
