@@ -61,6 +61,7 @@ int main(void)
   {
     printf("Select difficulty (1 = Easy, 2 = Medium, 3 = Hard, 4 = Impossible): ");
     scanf("%d", &difficulty);
+    getchar();
     if (difficulty < 1 || difficulty > 4)
     {
       printf("Invalid input. Please try again.\n");
@@ -125,7 +126,7 @@ void init_boards(int ***board, int ***board_state, int rows, int cols)
 {
   *board = (int **)malloc(rows * sizeof(int *));
   *board_state = (int **)malloc(rows * sizeof(int *));
-  if (!(*board) || !(board_state))
+  if (!(*board) || !(*board_state))
   {
     printf("Error: Memory allocation failed.\n");
     exit(EXIT_FAILURE);
