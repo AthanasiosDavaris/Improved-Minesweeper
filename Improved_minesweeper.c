@@ -37,6 +37,7 @@ int main(void)
   {
     printf("Enter the number of columns (min 8, max 16): ");
     scanf("%d", &cols);
+    getchar();
     if (cols < 8 || cols > 16)
     {
       printf("Invalid input. Please try again. \n");
@@ -47,6 +48,7 @@ int main(void)
   {
     printf("Enter the number of rows (min 8, max 16): ");
     scanf("%d", &rows);
+    getchar();
     if (rows < 8 || rows > 16)
     {
       printf("Invalid input. Please try again. \n");
