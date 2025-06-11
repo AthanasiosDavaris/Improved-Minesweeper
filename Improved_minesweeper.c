@@ -91,7 +91,7 @@ int main(void)
 
     int x, y;
     // open command
-    if (strncmp(input, "open", 4) == 0 && parse_cords(input, 4, &x))
+    if (strncmp(input, "open", 4) == 0 && (y = parse_cords(input, 4, &x)))
     {
       // Initialize mines at the start
       if (opened_cells == 0)
@@ -99,15 +99,15 @@ int main(void)
         place_mines(board, rows, cols, total_mines, x - 1, y - 1);
         calc_adj_mines(board, rows, cols);
       }
-      opened_cells = open_cell(x - 1, y - 1, board, board_state, rows, cols);
+      opened_cells += open_cell(x - 1, y - 1, board, board_state, rows, cols);
     }
     // mark command
-    else if (strncmp(input, "mark", 4) == 0 && parse_cords(input, 4, &x))
+    else if (strncmp(input, "mark", 4) == 0 && (y = parse_cords(input, 4, &x)))
     {
       mark_cell(x - 1, y - 1, board, board_state);
     }
     // cheat command
-    else if (strncmp(input, "cheat", 5) == 0 && parse_cords(input, 5, &x))
+    else if (strncmp(input, "cheat", 5) == 0 && (y = parse_cords(input, 4, &x)))
     {
       cheat(board, board_state, x - 1, y - 1);
     }
